@@ -71,10 +71,9 @@ public class CECS323JDBC {
             System.out.println("Connecting to database...");
             conn = DriverManager.getConnection(DB_URL);
 
-            int choice = 10;
-
-            while (choice != 0) {
-
+            boolean exit = false;
+            while (!exit) {
+                
                 System.out.println("1. List all writing groups.");
                 System.out.println("2. List all the data for a group specified by the user.");
                 System.out.println("3. List all publishers.");
@@ -86,51 +85,33 @@ public class CECS323JDBC {
                 System.out.println("9. Remove a book specified by the user.");
                 System.out.println("0. Exit the system.");
                 System.out.println("Select an option: ");
-                choice = in.nextInt();
-
-                // List all writing groups.
-                if (choice == 1) {
-
-                }
-
-                // List all the data for a group specified by the user.
-                if (choice == 2) {
-
-                }
-
-                // List all publishers.
-                if (choice == 3) {
-
-                }
-
-                // List all the data for a publisher specified by the user.
-                if (choice == 4) {
-
-                }
-
-                // List all book titles.
-                if (choice == 5) {
-
-                }
-
-                // List all the data for a book specified by the user.
-                if (choice == 6) {
-
-                }
-
-                // Insert a new book.
-                if (choice == 7) {
-
-                }
-
-                // Insert a new publisher and update all book published by one publisher to be published by the new publisher.
-                if (choice == 8) {
-                    // do some stupid stuff
-                }
-
-                // Remove a book specified by the user.
-                if (choice == 9) {
-
+                
+                int choice = in.nextInt();
+                
+                switch(choice) {
+                    case 1:
+                        break;
+                    case 2:
+                        break;
+                    case 3:
+                        break;
+                    case 4:
+                        break;
+                    case 5:
+                        break;
+                    case 6:
+                        break;
+                    case 7:
+                        break;
+                    case 8:
+                        break;
+                    case 9:
+                        break;
+                    case 0:
+                        exit = true;
+                        System.out.println("Goodbye...");
+                        break;
+                    default: System.out.println("Invalid input, please try again.");
                 }
             }
 
