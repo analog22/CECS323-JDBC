@@ -29,6 +29,9 @@ public class CECS323JDBC {
     static final String JDBC_DRIVER = "org.apache.derby.jdbc.ClientDriver";
     static String DB_URL = "jdbc:derby://localhost:1527/";
     // + "testdb;user=";
+    static Connection conn;
+    static Statement stmt;
+    static Scanner in;
 
     /**
      * Takes the input string and outputs "N/A" if the string is empty or null.
@@ -49,7 +52,7 @@ public class CECS323JDBC {
         // Prompt the user for the database name, and the credentials.
         // If your database has no credentials, you can update this code to 
         // remove that from the connection string.
-        Scanner in = new Scanner(System.in);
+        in = new Scanner(System.in);
         System.out.print("Name of the database (not the user account): ");
         DBNAME = in.nextLine();
         System.out.print("Database user name: ");
@@ -58,8 +61,8 @@ public class CECS323JDBC {
         PASS = in.nextLine();
         //Constructing the database URL connection string
         DB_URL = DB_URL + DBNAME + ";user=" + USER + ";password=" + PASS;
-        Connection conn = null; // initialize the connection
-        Statement stmt = null;  // initialize the statement that we're using
+        conn = null; // initialize the connection
+        stmt = null;  // initialize the statement that we're using
         try {
             // STEP 2: Register JDBC driver
             Class.forName("org.apache.derby.jdbc.ClientDriver");
@@ -71,50 +74,45 @@ public class CECS323JDBC {
             boolean exit = false;
             while (!exit) {
                 
-                /*
-                System.out.println("1. List all writing groups.");
-                System.out.println("2. List all the data for a group specified by the user.");
-                System.out.println("3. List all publishers.");
-                System.out.println("4. List all the data for a publisher specified by the user.");
-                System.out.println("5. List all book titles.");
-                System.out.println("6. List all the data for a book specified by the user.");
-                System.out.println("7. Insert a new book.");
-                System.out.println("8. Insert a new publisher and update all books published by one publisher to be published by the new publisher");
-                System.out.println("9. Remove a book specified by the user.");
-                System.out.println("0. Exit the system.");
-                System.out.println("Select an option: ");
-                */
                 printMenu();
-                int choice = in.nextInt();
+                
+                int choice = 10;
+                try {
+                    choice = in.nextInt();
+                } catch (InputMismatchException ime) {
+                    System.out.println("Invalid input, please try again.");
+                    promptEnterKey();
+                    printMenu();
+                }
                 in.nextLine();
                 
                 switch(choice) {
                     case 1:
-                        listAllGroups(conn, stmt, in);
+                        listAllGroups();
                         break;
                     case 2:
-                        listSpecificBook(conn, stmt, in);
+                        listSpecificGroup();
                         break;
                     case 3:
-                        listAllPublishers(conn, stmt, in);
+                        listAllPublishers();
                         break;
                     case 4:
-                        listSpecificPublisher(conn, stmt, in);
+                        listSpecificPublisher();
                         break;
                     case 5:
-                        listAllBooks(conn, stmt, in);
+                        listAllBooks();
                         break;
                     case 6:
-                        listSpecificBook(conn, stmt, in);
+                        listSpecificBook();
                         break;
                     case 7:
-                        addNewBook(conn, stmt, in);
+                        addNewBook();
                         break;
                     case 8:
-                        addNewPublisher(conn, stmt, in);
+                        addNewPublisher();
                         break;
                     case 9:
-                        removeBook(conn, stmt, in);
+                        removeBook();
                         break;
                     case 0:
                         exit = true;
@@ -123,30 +121,6 @@ public class CECS323JDBC {
                 }
             }
 
-            //STEP 4: Execute a query
-            System.out.println("Creating statement...");
-            stmt = conn.createStatement();
-            String sql;
-            sql = "SELECT * FROM Books";
-            ResultSet rs = stmt.executeQuery(sql);
-
-            //STEP 5: Extract data from result set
-            System.out.printf(displayFormat, "Title", "Year Published", "Number of Pages", "Group Name", "Publisher Name");
-            while (rs.next()) {
-                //Retrieve by column name
-                String title = rs.getString("bookTitle");
-                String year = rs.getString("yearPublished");
-                String pages = rs.getString("numberPages");
-                String group = rs.getString("groupName");
-                String publisher = rs.getString("publisherName");
-
-                //Display values
-                System.out.printf(displayFormat,
-                        dispNull(title), dispNull(year), dispNull(pages), dispNull(group), dispNull(publisher));
-            }
-
-            //STEP 6: Clean-up environment
-            rs.close();
             stmt.close();
             conn.close();
         } catch (SQLException se) {
@@ -189,7 +163,7 @@ public class CECS323JDBC {
     }
 
     // 1
-    public static void listAllGroups(Connection conn, Statement stmt, Scanner in) {
+    public static void listAllGroups() {
         try {
             stmt = conn.createStatement();
             String sql;
@@ -212,7 +186,7 @@ public class CECS323JDBC {
     }
 
     // 2
-    public static void listSpecificGroup(Connection conn, Statement stmt, Scanner in) {
+    public static void listSpecificGroup() {
         try {
             System.out.println("Input a group name: ");
             String groupName = in.nextLine();
@@ -242,7 +216,7 @@ public class CECS323JDBC {
     }
 
     // 3
-    public static void listAllPublishers(Connection conn, Statement stmt, Scanner in) {
+    public static void listAllPublishers() {
         try {
             stmt = conn.createStatement();
             String sql;
@@ -265,7 +239,7 @@ public class CECS323JDBC {
     }
 
     // 4
-    public static void listSpecificPublisher(Connection conn, Statement stmt, Scanner in) {
+    public static void listSpecificPublisher() {
         try {
             System.out.println("Input a publisher name: ");
             String publisherName = in.nextLine();
@@ -295,9 +269,8 @@ public class CECS323JDBC {
     }
 
     // 5
-    public static void listAllBooks(Connection conn, Statement stmt, Scanner in) {
+    public static void listAllBooks() {
         try {
-            System.out.println("Creating statement...");
             stmt = conn.createStatement();
             String sql;
             sql = "SELECT bookTitle FROM Books";
@@ -319,7 +292,7 @@ public class CECS323JDBC {
     }
     
     // 6
-    public static void listSpecificBook(Connection conn, Statement stmt, Scanner in) {
+    public static void listSpecificBook() {
         try {
             System.out.println("Input a book title: ");
             String bookTitle = in.nextLine();
@@ -350,7 +323,7 @@ public class CECS323JDBC {
     }
     
     // 7
-    public static void addNewBook(Connection conn, Statement stmt, Scanner in) {
+    public static void addNewBook() {
         try {
             System.out.println("Input book title: ");
             String title = in.nextLine();
@@ -376,12 +349,12 @@ public class CECS323JDBC {
         }
     }
     
-    public static void addNewPublisher(Connection conn, Statement stmt, Scanner in) {
+    public static void addNewPublisher() {
         // do stuff
     }
 
     // 9
-    public static void removeBook(Connection conn, Statement stmt, Scanner in) {
+    public static void removeBook() {
         try {
             System.out.println("Input book title to delete: ");
             String title = in.nextLine();
