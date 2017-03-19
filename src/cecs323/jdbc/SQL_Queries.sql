@@ -32,9 +32,9 @@ INSERT INTO Books(bookTitle, yearPublished, numberPages, groupName, publisherNam
 -- published by the new publisher.
 INSERT INTO Publishers(publisherName, publisherAddress, publisherPhone, publisherEmail)
     VALUES ('publisherName', 'publisherAddress', 'publisherPhone', 'publisherEmail');
-UPDATE Publishers SET publisherName = 'newPublisher'
-WHERE publisherName = 'oldPublisher';
 UPDATE Books SET publisherName = 'newPublisher'
+WHERE publisherName = 'oldPublisher';
+DELETE FROM Publishers
 WHERE publisherName = 'oldPublisher';
 
 -- Remove a book specified by the user

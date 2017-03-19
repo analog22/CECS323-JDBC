@@ -24,7 +24,7 @@ public class CECS323JDBC {
     // The number indicates how wide to make the field.
     // The "s" denotes that it's a string.  All of our output in this test are 
     // strings, but that won't always be the case.
-    static final String displayFormat = "%-5s%-15s%-15s%-15s\n";
+    static String displayFormat;
     // JDBC driver name and database URL
     static final String JDBC_DRIVER = "org.apache.derby.jdbc.ClientDriver";
     static String DB_URL = "jdbc:derby://localhost:1527/";
@@ -197,6 +197,7 @@ public class CECS323JDBC {
                     + "WHERE groupName = '" + groupName + "'";
             ResultSet rs = stmt.executeQuery(sql);
 
+            displayFormat = "%-30%-30s%-30s%-30s\n";
             System.out.printf(displayFormat, "Group Name", "Head Writer", "Year Formed", "Subject");
             while (rs.next()) {
                 //Retrieve by column name
@@ -250,6 +251,7 @@ public class CECS323JDBC {
                     + "WHERE publisherName = '" + publisherName + "'";
             ResultSet rs = stmt.executeQuery(sql);
 
+            displayFormat = "%-30s%-30s%-30s%-30s\n";
             System.out.printf(displayFormat, "Name", "Address", "Phone", "Email");
             while (rs.next()) {
                 //Retrieve by column name
@@ -303,6 +305,7 @@ public class CECS323JDBC {
                     + "WHERE bookTitle = '" + bookTitle + "'";
             ResultSet rs = stmt.executeQuery(sql);
 
+            displayFormat = "%-30s%-30s%-30s%-30s%-30s\n";
             System.out.printf(displayFormat, "Title", "Year Published", "Number of Pages", "Group Name", "Publisher Name");
             while (rs.next()) {
                 //Retrieve by column name
@@ -353,7 +356,32 @@ public class CECS323JDBC {
     }
 
     public static void addNewPublisher() {
-        // do stuff
+        try {
+            System.out.println("Input publisher name: ");
+            String name = in.nextLine();
+            System.out.println("Input publisher address; ");
+            String address = in.nextLine();
+            System.out.println("Input publisher phone: ");
+            String phone = in.nextLine();
+            System.out.println("Input publisher email: ");
+            String email = in.nextLine();
+            System.out.println("Input publisher to replace: ");
+            String oldPublisher = in.nextLine();
+            
+            stmt = conn.createStatement();
+            String sql;
+            sql = "INSERT INTO Publishers(publisherName, publisherAddress, publisherPhone, publisherEmail) "
+                    + "VALUES (" + name + ", " + address + ", " + phone + ", " + email + ");"
+                    + "UPDATE Books SET publisherName = '" + name + "'"
+                    + "WHERE publisherName = '" + oldPublisher + "';"
+                    + "DELETE FROM Publishers"
+                    + "WHERE publisherName = '" + oldPublisher + "';";
+            ResultSet rs = stmt.executeQuery(sql);
+            
+            promptEnterKey();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     // 9
