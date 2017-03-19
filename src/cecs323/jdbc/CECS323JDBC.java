@@ -381,7 +381,7 @@ public class CECS323JDBC {
             String oldPublisher = in.nextLine();
 
             pstmt = conn.prepareStatement(
-                    "INSERT INTO Publishers(publisherName, publisherName, publisherPhone, pubisherEmail) VALUES (?, ?, ?, ?)"
+                    "INSERT INTO Publishers(publisherName, publisherAddress, publisherPhone, publisherEmail) VALUES (?, ?, ?, ?)"
             );
             pstmt.setString(1, name);
             pstmt.setString(2, address);
