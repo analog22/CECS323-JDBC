@@ -1,0 +1,1 @@
+This project is to connect Java with a derby database. Books, writing groups, and publishers.
