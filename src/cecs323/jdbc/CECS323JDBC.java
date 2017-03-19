@@ -383,17 +383,28 @@ public class CECS323JDBC {
             System.out.println("Input publisher to replace: ");
             String oldPublisher = in.nextLine();
             
-            stmt = conn.createStatement();
-            String sql;
-            sql = "INSERT INTO Publishers(publisherName, publisherAddress, publisherPhone, publisherEmail) "
-                    + "VALUES ('" + name + "', '" + address + "', '" + phone + "', '" + email + "');"
-                    + "UPDATE Books SET publisherName = '" + name + "'"
-                    + "WHERE publisherName = '" + oldPublisher + "';"
-                    + "DELETE FROM Publishers"
-                    + "WHERE publisherName = '" + oldPublisher + "';";
-            ResultSet rs = stmt.executeQuery(sql);
+            pstmt = conn.prepareStatement(
+                "INSERT INTO Publishers(publisherName, publisherName, publisherPhone, pubisherEmail) VALUES (?, ?, ?, ?)"
+            );
+            pstmt.setString(1, name);
+            pstmt.setString(2, address);
+            pstmt.setString(3, phone);
+            pstmt.setString(4, email);
+            pstmt.executeUpdate();
             
-            rs.close();
+            pstmt = conn.prepareStatement(
+                "UPDATE Books SET publisherName = ? WHERE publisherName = ?"
+            );
+            pstmt.setString(1, name);
+            pstmt.setString(2, oldPublisher);
+            pstmt.executeUpdate();
+            
+            pstmt = conn.prepareStatement(
+                "DELETE FROM Publishers WHERE publisherName = ?"
+            );
+            pstmt.setString(1, oldPublisher);
+            pstmt.executeUpdate();
+            
             promptEnterKey();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -407,7 +418,7 @@ public class CECS323JDBC {
             String title = in.nextLine();
 
             pstmt = conn.prepareStatement(
-                "DELTE FROM Books WHERE bookTitle = ?"      
+                "DELETE FROM Books WHERE bookTitle = ?"      
             );
             pstmt.setString(1, title);
             pstmt.executeUpdate();
