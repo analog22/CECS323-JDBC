@@ -81,6 +81,7 @@ public class CECS323JDBC {
                     choice = in.nextInt();
                 } catch (InputMismatchException ime) {
                     System.out.println("Invalid input, please try again...");
+                    in.nextLine();
                     promptEnterKey();
                     printMenu();
                 }
