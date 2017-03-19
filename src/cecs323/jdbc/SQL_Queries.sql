@@ -26,10 +26,12 @@ WHERE bookTitle = 'bookTitle';
 
 -- Insert a new book
 INSERT INTO Books(bookTitle, yearPublished, numberPages, groupName, publisherName)
-    VALUES ('title', 2000, 200, 'groupName', 'publisherName');
+    VALUES ('bookTitle', 2000, 200, 'groupName', 'publisherName');
 
 -- Insert a new publisher and update all book published by one publisher to be
 -- published by the new publisher.
+INSERT INTO Publishers(publisherName, publisherAddress, publisherPhone, publisherEmail)
+    VALUES ('publisherName', 'publisherAddress', 'publisherPhone', 'publisherEmail');
 UPDATE Publishers SET publisherName = 'newPublisher'
 WHERE publisherName = 'oldPublisher';
 UPDATE Books SET publisherName = 'newPublisher'
