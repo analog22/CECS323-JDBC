@@ -9,7 +9,6 @@ import java.sql.*;
 import java.util.*;
 
 /**
- *
  * @author Mimi Opkins with some tweaking from Dave Brown Matthew Kim 011846417
  */
 public class CECS323JDBC {
@@ -22,7 +21,7 @@ public class CECS323JDBC {
     // each % denotes the start of a new field.
     // The - denotes left justification.
     // The number indicates how wide to make the field.
-    // The "s" denotes that it's a string.  All of our output in this test are 
+    // The "s" denotes that it's a string.  Alle of our output in this test are 
     // strings, but that won't always be the case.
     static String displayFormat;
     // JDBC driver name and database URL
@@ -32,6 +31,7 @@ public class CECS323JDBC {
     static Connection conn;
     static Statement stmt;
     static Scanner in;
+    static PreparedStatement pstmt;
 
     /**
      * Takes the input string and outputs "N/A" if the string is empty or null.
@@ -59,7 +59,7 @@ public class CECS323JDBC {
         USER = in.nextLine();
         System.out.print("Database password: ");
         PASS = in.nextLine();
-        //Constructing the database URL connection string
+        // Constructing the database URL connection string
         DB_URL = DB_URL + DBNAME + ";user=" + USER + ";password=" + PASS;
         conn = null; // initialize the connection
         stmt = null; // initialize the statement that we're using
@@ -73,14 +73,15 @@ public class CECS323JDBC {
 
             boolean exit = false;
             while (!exit) {
-
+                
                 printMenu();
 
                 int choice = 10;
                 try {
                     choice = in.nextInt();
                 } catch (InputMismatchException ime) {
-                    System.out.println("Invalid input, please try again.");
+                    System.out.println("Invalid input, please try again...");
+                    in.nextLine();
                     promptEnterKey();
                     printMenu();
                 }
@@ -118,20 +119,19 @@ public class CECS323JDBC {
                         exit = true;
                         break;
                     default:
-                        System.out.println("Invalid input, please try again.");
+                        System.out.println("Invalid input, please try again...");
+                        promptEnterKey();
                 }
             }
-
-            stmt.close();
-            conn.close();
+            
         } catch (SQLException se) {
-            //Handle errors for JDBC
+            // Handle errors for JDBC
             se.printStackTrace();
         } catch (Exception e) {
-            //Handle errors for Class.forName
+            // Handle errors for Class.forName
             e.printStackTrace();
         } finally {
-            //finally block used to close resources
+            // finally block used to close resources
             try {
                 if (stmt != null) {
                     stmt.close();
@@ -144,11 +144,12 @@ public class CECS323JDBC {
                 }
             } catch (SQLException se) {
                 se.printStackTrace();
-            }//end finally try
-        }//end try
+            }// end finally try
+        }// end try
         System.out.println("Goodbye!");
-    }//end main
+    }// end main
 
+    // Print the menu
     public static void printMenu() {
         System.out.println("1. List all writing groups.");
         System.out.println("2. List all the data for a group specified by the user.");
@@ -160,16 +161,16 @@ public class CECS323JDBC {
         System.out.println("8. Insert a new publisher and update all books published by one publisher to be published by the new publisher");
         System.out.println("9. Remove a book specified by the user.");
         System.out.println("0. Exit the system.");
-        System.out.println("Select an option: ");
+        System.out.print("Select an option: ");
     }
 
     // 1
     public static void listAllGroups() {
         try {
-            stmt = conn.createStatement();
-            String sql;
-            sql = "SELECT groupName FROM WritingGroups";
-            ResultSet rs = stmt.executeQuery(sql);
+            pstmt = conn.prepareStatement(
+                    "SELECT groupName FROM WritingGroups"
+            );
+            ResultSet rs = pstmt.executeQuery();
 
             System.out.println("Group Name");
             while (rs.next()) {
@@ -180,6 +181,7 @@ public class CECS323JDBC {
                 System.out.println(name);
             }
 
+            rs.close();
             promptEnterKey();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -191,11 +193,11 @@ public class CECS323JDBC {
         try {
             System.out.println("Input a group name: ");
             String groupName = in.nextLine();
-            stmt = conn.createStatement();
-            String sql;
-            sql = "SELECT * FROM WritingGroups "
-                    + "WHERE groupName = '" + groupName + "'";
-            ResultSet rs = stmt.executeQuery(sql);
+            pstmt = conn.prepareStatement(
+                    "SELECT * FROM WritingGroups WHERE groupName = ?"
+            );
+            pstmt.setString(1, groupName);
+            ResultSet rs = pstmt.executeQuery();
 
             displayFormat = "%-30%-30s%-30s%-30s\n";
             System.out.printf(displayFormat, "Group Name", "Head Writer", "Year Formed", "Subject");
@@ -211,6 +213,7 @@ public class CECS323JDBC {
                         dispNull(name), dispNull(head), dispNull(year), dispNull(subject));
             }
 
+            rs.close();
             promptEnterKey();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -220,10 +223,10 @@ public class CECS323JDBC {
     // 3
     public static void listAllPublishers() {
         try {
-            stmt = conn.createStatement();
-            String sql;
-            sql = "SELECT publisherName FROM Publishers";
-            ResultSet rs = stmt.executeQuery(sql);
+            pstmt = conn.prepareStatement(
+                    "SELECT publisherName FROM Publishers"
+            );
+            ResultSet rs = pstmt.executeQuery();
 
             System.out.println("Publisher Name");
             while (rs.next()) {
@@ -234,6 +237,7 @@ public class CECS323JDBC {
                 System.out.println(name);
             }
 
+            rs.close();
             promptEnterKey();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -245,11 +249,11 @@ public class CECS323JDBC {
         try {
             System.out.println("Input a publisher name: ");
             String publisherName = in.nextLine();
-            stmt = conn.createStatement();
-            String sql;
-            sql = "SELECT * FROM Publishers "
-                    + "WHERE publisherName = '" + publisherName + "'";
-            ResultSet rs = stmt.executeQuery(sql);
+            pstmt = conn.prepareStatement(
+                    "SELECT * FROM Publishers WHERE publisherName = ?"
+            );
+            pstmt.setString(1, publisherName);
+            ResultSet rs = pstmt.executeQuery();
 
             displayFormat = "%-30s%-30s%-30s%-30s\n";
             System.out.printf(displayFormat, "Name", "Address", "Phone", "Email");
@@ -265,6 +269,7 @@ public class CECS323JDBC {
                         dispNull(name), dispNull(address), dispNull(phone), dispNull(email));
             }
 
+            rs.close();
             promptEnterKey();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -274,10 +279,10 @@ public class CECS323JDBC {
     // 5
     public static void listAllBooks() {
         try {
-            stmt = conn.createStatement();
-            String sql;
-            sql = "SELECT bookTitle FROM Books";
-            ResultSet rs = stmt.executeQuery(sql);
+            pstmt = conn.prepareStatement(
+                    "SELECT bookTitle FROM Books"
+            );
+            ResultSet rs = pstmt.executeQuery();
 
             System.out.println("Book Title");
             while (rs.next()) {
@@ -288,6 +293,7 @@ public class CECS323JDBC {
                 System.out.println(title);
             }
 
+            rs.close();
             promptEnterKey();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -299,11 +305,11 @@ public class CECS323JDBC {
         try {
             System.out.println("Input a book title: ");
             String bookTitle = in.nextLine();
-            stmt = conn.createStatement();
-            String sql;
-            sql = "SELECT * FROM Books "
-                    + "WHERE bookTitle = '" + bookTitle + "'";
-            ResultSet rs = stmt.executeQuery(sql);
+            pstmt = conn.prepareStatement(
+                    "SELECT * FROM Books WHERE bookTitle = ?"
+            );
+            pstmt.setString(1, bookTitle);
+            ResultSet rs = pstmt.executeQuery();
 
             displayFormat = "%-30s%-30s%-30s%-30s%-30s\n";
             System.out.printf(displayFormat, "Title", "Year Published", "Number of Pages", "Group Name", "Publisher Name");
@@ -320,6 +326,7 @@ public class CECS323JDBC {
                         dispNull(title), dispNull(year), dispNull(pages), dispNull(group), dispNull(publisher));
             }
 
+            rs.close();
             promptEnterKey();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -342,19 +349,25 @@ public class CECS323JDBC {
             System.out.println("Input publisher name: ");
             String publisher = in.nextLine();
 
-            stmt = conn.createStatement();
-            String sql;
-            sql = "INSERT INTO Books (bookTitle, yearPublished, numberPages, groupName, publisherName) "
-                    + "VALUES (" + title + ", " + year + ", " + pages + ", " + group + ", " + publisher + ")";
-            ResultSet rs = stmt.executeQuery(sql);
+            pstmt = conn.prepareStatement(
+                    "INSERT INTO Books (bookTitle, yearPublished, numberPages, groupName, publisherName) VALUES (?, ?, ?, ?, ?)"
+            );
+            pstmt.setString(1, title);
+            pstmt.setInt(2, year);
+            pstmt.setInt(3, pages);
+            pstmt.setString(4, group);
+            pstmt.setString(5, publisher);
+            pstmt.executeUpdate();
 
             System.out.println("Book successfully added...");
+
             promptEnterKey();
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
+    // 8
     public static void addNewPublisher() {
         try {
             System.out.println("Input publisher name: ");
@@ -367,17 +380,29 @@ public class CECS323JDBC {
             String email = in.nextLine();
             System.out.println("Input publisher to replace: ");
             String oldPublisher = in.nextLine();
-            
-            stmt = conn.createStatement();
-            String sql;
-            sql = "INSERT INTO Publishers(publisherName, publisherAddress, publisherPhone, publisherEmail) "
-                    + "VALUES (" + name + ", " + address + ", " + phone + ", " + email + ");"
-                    + "UPDATE Books SET publisherName = '" + name + "'"
-                    + "WHERE publisherName = '" + oldPublisher + "';"
-                    + "DELETE FROM Publishers"
-                    + "WHERE publisherName = '" + oldPublisher + "';";
-            ResultSet rs = stmt.executeQuery(sql);
-            
+
+            pstmt = conn.prepareStatement(
+                    "INSERT INTO Publishers(publisherName, publisherAddress, publisherPhone, publisherEmail) VALUES (?, ?, ?, ?)"
+            );
+            pstmt.setString(1, name);
+            pstmt.setString(2, address);
+            pstmt.setString(3, phone);
+            pstmt.setString(4, email);
+            pstmt.executeUpdate();
+
+            pstmt = conn.prepareStatement(
+                    "UPDATE Books SET publisherName = ? WHERE publisherName = ?"
+            );
+            pstmt.setString(1, name);
+            pstmt.setString(2, oldPublisher);
+            pstmt.executeUpdate();
+
+            pstmt = conn.prepareStatement(
+                    "DELETE FROM Publishers WHERE publisherName = ?"
+            );
+            pstmt.setString(1, oldPublisher);
+            pstmt.executeUpdate();
+
             promptEnterKey();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -390,22 +415,26 @@ public class CECS323JDBC {
             System.out.println("Input book title to delete: ");
             String title = in.nextLine();
 
-            stmt = conn.createStatement();
-            String sql;
-            sql = "DELETE FROM Books WHERE bookTitle = '" + title + "'";
-            ResultSet rs = stmt.executeQuery(sql);
+            pstmt = conn.prepareStatement(
+                    "DELETE FROM Books WHERE bookTitle = ?"
+            );
+            pstmt.setString(1, title);
+            pstmt.executeUpdate();
 
             System.out.println("Book successfully removed...");
+
             promptEnterKey();
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
+    // Prompt user for ENTER keypress
+    // Used to ensure the user progresses the program
     public static void promptEnterKey() {
         System.out.println("Press \"ENTER\" to continue...");
         Scanner in = new Scanner(System.in);
         in.nextLine();
     }
 
-}//end FirstExample}
+}
