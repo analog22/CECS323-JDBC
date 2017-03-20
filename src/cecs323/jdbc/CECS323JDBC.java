@@ -198,7 +198,7 @@ public class CECS323JDBC {
             pstmt.setString(1, groupName);
             ResultSet rs = pstmt.executeQuery();
 
-            displayFormat = "%-30%-30s%-30s%-30s\n";
+            displayFormat = "%-30s%-30s%-30s%-30s\n";
             System.out.printf(displayFormat, "Group Name", "Head Writer", "Year Formed", "Subject");
             while (rs.next()) {
                 //Retrieve by column name
@@ -376,7 +376,7 @@ public class CECS323JDBC {
 
                 //Display values
                 System.out.printf(displayFormat,
-                        dispNull(title), dispNull(byear), dispNull(bpages), dispNull(group), dispNull(publisher));
+                        dispNull(btitle), dispNull(byear), dispNull(bpages), dispNull(bgroup), dispNull(bpublisher));
             }
             rs.close();
 
@@ -479,7 +479,7 @@ public class CECS323JDBC {
                 String btitle = rs.getString("bookTitle");
 
                 //Display values
-                System.out.println(title);
+                System.out.println(btitle);
             }
 
             rs.close();
