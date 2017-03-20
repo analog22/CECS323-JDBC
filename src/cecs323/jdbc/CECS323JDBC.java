@@ -21,7 +21,7 @@ public class CECS323JDBC {
     // each % denotes the start of a new field.
     // The - denotes left justification.
     // The number indicates how wide to make the field.
-    // The "s" denotes that it's a string.  Alle of our output in this test are 
+    // The "s" denotes that it's a string.  All of our output in this test are 
     // strings, but that won't always be the case.
     static String displayFormat;
     // JDBC driver name and database URL
@@ -29,7 +29,6 @@ public class CECS323JDBC {
     static String DB_URL = "jdbc:derby://localhost:1527/";
     // + "testdb;user=";
     static Connection conn;
-    static Statement stmt;
     static Scanner in;
     static PreparedStatement pstmt;
 
@@ -62,7 +61,7 @@ public class CECS323JDBC {
         // Constructing the database URL connection string
         DB_URL = DB_URL + DBNAME + ";user=" + USER + ";password=" + PASS;
         conn = null; // initialize the connection
-        stmt = null; // initialize the statement that we're using
+        pstmt = null; // initialize the statement that we're using
         try {
             // STEP 2: Register JDBC driver
             Class.forName("org.apache.derby.jdbc.ClientDriver");
@@ -133,8 +132,8 @@ public class CECS323JDBC {
         } finally {
             // finally block used to close resources
             try {
-                if (stmt != null) {
-                    stmt.close();
+                if (pstmt != null) {
+                    pstmt.close();
                 }
             } catch (SQLException se2) {
             }// nothing we can do
@@ -358,6 +357,28 @@ public class CECS323JDBC {
             pstmt.setString(4, group);
             pstmt.setString(5, publisher);
             pstmt.executeUpdate();
+            
+            pstmt = conn.prepareStatement(
+                    "SELECT * FROM Books WHERE bookTitle = ?"
+            );
+            pstmt.setString(1, title);
+            ResultSet rs = pstmt.executeQuery();
+
+            displayFormat = "%-30s%-30s%-30s%-30s%-30s\n";
+            System.out.printf(displayFormat, "Title", "Year Published", "Number of Pages", "Group Name", "Publisher Name");
+            while (rs.next()) {
+                //Retrieve by column name
+                String btitle = rs.getString("bookTitle");
+                String byear = rs.getString("yearPublished");
+                String bpages = rs.getString("numberPages");
+                String bgroup = rs.getString("groupName");
+                String bpublisher = rs.getString("publisherName");
+
+                //Display values
+                System.out.printf(displayFormat,
+                        dispNull(title), dispNull(byear), dispNull(bpages), dispNull(group), dispNull(publisher));
+            }
+            rs.close();
 
             System.out.println("Book successfully added...");
 
@@ -372,7 +393,7 @@ public class CECS323JDBC {
         try {
             System.out.println("Input publisher name: ");
             String name = in.nextLine();
-            System.out.println("Input publisher address; ");
+            System.out.println("Input publisher address: ");
             String address = in.nextLine();
             System.out.println("Input publisher phone: ");
             String phone = in.nextLine();
@@ -402,6 +423,30 @@ public class CECS323JDBC {
             );
             pstmt.setString(1, oldPublisher);
             pstmt.executeUpdate();
+            
+            pstmt = conn.prepareStatement(
+                    "SELECT * FROM Books WHERE publisherName = ?"
+            );
+            pstmt.setString(1, name);
+            ResultSet rs = pstmt.executeQuery();
+
+            displayFormat = "%-30s%-30s%-30s%-30s%-30s\n";
+            System.out.printf(displayFormat, "Title", "Year Published", "Number of Pages", "Group Name", "Publisher Name");
+            while (rs.next()) {
+                //Retrieve by column name
+                String title = rs.getString("bookTitle");
+                String year = rs.getString("yearPublished");
+                String pages = rs.getString("numberPages");
+                String group = rs.getString("groupName");
+                String publisher = rs.getString("publisherName");
+
+                //Display values
+                System.out.printf(displayFormat,
+                        dispNull(title), dispNull(year), dispNull(pages), dispNull(group), dispNull(publisher));
+            }
+            rs.close();
+            
+            System.out.println("Publisher added, old publisher replaced...");
 
             promptEnterKey();
         } catch (SQLException e) {
@@ -421,6 +466,24 @@ public class CECS323JDBC {
             pstmt.setString(1, title);
             pstmt.executeUpdate();
 
+            System.out.println("Book successfully removed...");
+            
+            pstmt = conn.prepareStatement(
+                    "SELECT bookTitle FROM Books"
+            );
+            ResultSet rs = pstmt.executeQuery();
+
+            System.out.println("Book Title");
+            while (rs.next()) {
+                //Retrieve by column name
+                String btitle = rs.getString("bookTitle");
+
+                //Display values
+                System.out.println(title);
+            }
+
+            rs.close();
+            
             System.out.println("Book successfully removed...");
 
             promptEnterKey();
